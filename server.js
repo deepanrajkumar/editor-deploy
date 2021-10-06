@@ -1,6 +1,12 @@
 const { MongoClient } = require("mongodb");
 const cors = require("cors");
 const express = require("express");
+const { networkInterfaces } = require("os");
+
+console.log(
+  "OS",
+  networkInterfaces().en0.find((data) => data.family === "IPv4")
+);
 const app = express();
 // or as an es module:
 // import { MongoClient } from 'mongodb'
