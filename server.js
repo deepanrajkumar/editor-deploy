@@ -16,7 +16,6 @@ const dbName = "editor";
 // Use connect method to connect to the server
 const connectDB = async (action, params) => {
   await client.connect();
-  console.log("Connected successfully to server");
   const db = client.db(dbName);
   const collection = db.collection("editorCollection");
 
@@ -25,12 +24,14 @@ const connectDB = async (action, params) => {
       return await collection.find({}).toArray();
     case "add":
       return await collection.insertMany([params]);
+    case "edit":
+      return await collection.updateOne(params.old, { $set: params.update });
     case "delete":
       return await collection.deleteMany(params);
     default:
       break;
   }
-  client.close();
+  await client.close();
 };
 
 app.use(cors());
@@ -49,6 +50,12 @@ app.get("/list", (req, res) => {
 
 app.post("/add", (req, res) => {
   connectDB("add", req.body)
+    .then((data) => res.end(JSON.stringify(data)))
+    .catch((error) => res.end(JSON.stringify(error)));
+});
+
+app.post("/edit", (req, res) => {
+  connectDB("edit", req.body)
     .then((data) => res.end(JSON.stringify(data)))
     .catch((error) => res.end(JSON.stringify(error)));
 });
